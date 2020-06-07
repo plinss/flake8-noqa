@@ -81,7 +81,7 @@ class FileChecker(flake8.checker.FileChecker):
 class Message(enum.Enum):
 	"""Messages."""
 
-	NOQA_NO_VIOLATIONS = (1, '""{comment}" has no violations')
+	NOQA_NO_VIOLATIONS = (1, '"{comment}" has no violations')
 	NOQA_NO_MATCHING_CODES = (2, '"{comment}" has no matching violations')
 	NOQA_UNMATCHED_CODES = (3, '"{comment}" has unmatched {plural}, remove {unmatched}')
 	NOQA_REQUIRE_CODE = (4, '"{comment}" must have codes, e.g. "# {noqa_strip}: {codes}"')

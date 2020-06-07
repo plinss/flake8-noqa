@@ -9,7 +9,7 @@ with open("README.md", "r") as readme_file:
 
 setuptools.setup(
 	name='flake8-noqa',
-	version='0.0.0',  # version will get replaced by git version tag - do not edit
+	version='1.999.999-dev',  # version will get replaced by git version tag - do not edit
 	author='Peter Linss',
 	author_email='pypi@linss.com',
 	description='Flake8 noqa comment validation',
@@ -35,6 +35,7 @@ setuptools.setup(
 			'flake8-datetimez',
 			'flake8-docstrings',
 			'flake8-import-order',
+			'flake8-literal',
 			'flake8-polyfill',
 			'flake8-tabs',
 			# 'flake8-smart-tabs',

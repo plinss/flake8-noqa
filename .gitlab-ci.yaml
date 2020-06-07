@@ -31,7 +31,7 @@ test:
   stage: test
   before_script:
     - source .gitlab-ci.env
-    - pip install -e .
+    - pip install -e ".[test]"
     - chmod a+x test.py
   script:
     - ./test.py
