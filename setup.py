@@ -12,7 +12,7 @@ setuptools.setup(
 	version='0.0.0',  # version will get replaced by git version tag - do not edit
 	author='Peter Linss',
 	author_email='pypi@linss.com',
-	description='Flake8 noqa Plugin',
+	description='Flake8 noqa comment validation',
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url='https://github.com/plinss/flake8-noqa/',

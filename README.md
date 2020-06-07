@@ -64,13 +64,14 @@ Error Codes
 | NQA001 | "`#noqa`" must have a single space after the hash, e.g. "`# noqa`" |
 | NQA002 | "`# noqa X000`" must have a colon, e.g. "`# noqa: X000`" |
 | NQA003 | "`# noqa:  X000`" must have at most one space before the codes, e.g. "`# noqa: X000`" |
-| NQA004 | "`# noqa`" comment must have one or more codes, e.g. "`# noqa: X000`" (enable via `noqa-require-code`) |
-| NQA005 | "`# noqa: X000, X000`" has duplicate codes, remove X000 |
+| NQA004 | "`# noqa: X000, X000`" has duplicate codes, remove X000 |
 | NQA010 | "`#flake8: noqa`" must have a single space after the hash, e.g. "`# flake8: noqa`" |
 | NQA011 | "`# flake8 noqa`" must have a colon or equals, e.g. "`# flake8: noqa`" |
-| NQA101 | No violations, remove "`# noqa`" |
-| NQA102 | No matching violations, remove "`# noqa: X000`" |
-| NQA103 | Unused code(s) present in "`# noqa: X000, X001`", remove X001 |
+| NQA101 | "`# noqa`" has no violations |
+| NQA102 | "`# noqa: X000`" has no matching violations |
+| NQA103 | "`# noqa: X000, X001`" has unmatched code(s), remove X001 |
+| NQA104 | "`# noqa`" must have codes, e.g. "`# noqa: X000`" (enable via `noqa-require-code`) |
+
 
 
 Examples
@@ -81,5 +82,5 @@ Examples
 x = 1+2  #noqa  <-- ignored (NQA001)
 x = 1+2  # noqa E226  <-- treated as a blanket noqa (NQA002)
 x = 1+2  # noqa:  E226  <-- treated as a blanket noqa (NQA003)
-x = 1+2 # noqa: X101, E261 <-- unused code (NQA103)
+x = 1+2 # noqa: X101, E261 <-- unmatched code (NQA103)
 ```
