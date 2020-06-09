@@ -11,9 +11,9 @@ import flake8.style_guide
 import flake8.utils
 
 
-NOQA_FILE = re.compile(r'\s*#(?P<flake8>\s*flake8)(?P<sep>[:=])?(?P<noqa>(?:\b|\s*)noqa)', re.IGNORECASE)
-NOQA_INLINE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>:?)', re.IGNORECASE)
-NOQA_INLINE_WITH_CODE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>:?)(?P<codes>\s*([a-z]+[0-9]+(?:[,\s]+)?)+)', re.IGNORECASE)
+NOQA_FILE = re.compile(r'\s*#(?P<flake8>\s*flake8)(?P<sep>\s*[:=])?(?P<noqa>(?:\b|\s*)noqa)', re.IGNORECASE)
+NOQA_INLINE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>\s*:)?', re.IGNORECASE)
+NOQA_INLINE_WITH_CODE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>\s*:)?(?P<codes>\s*([a-z]+[0-9]+(?:[,\s]+)?)+)', re.IGNORECASE)
 
 
 class FileComment:

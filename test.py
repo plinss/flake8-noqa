@@ -17,7 +17,7 @@ def flake8(test: str, options: List[str] = None) -> List[str]:
 	os.remove(temp_file.name)
 	if (stderr):
 		return [f"0:0:{line}" for line in stderr.decode('utf-8').splitlines()]
-	print(repr([line.split(':', 1)[1] for line in stdout.decode('utf-8').splitlines()]))
+	# print(repr(test), repr([line.split(':', 1)[1] for line in stdout.decode('utf-8').splitlines()]))
 	return [line.split(':', 1)[1] for line in stdout.decode('utf-8').splitlines()]
 
 
@@ -25,11 +25,30 @@ class TestFileScope(unittest.TestCase):
 	"""Test file scope comments."""
 
 	def test_valid(self):
+		self.assertEqual(flake8('# flake8:noqa'), [])
 		self.assertEqual(flake8('# flake8: noqa'), [])
+		self.assertEqual(flake8('# flake8:  noqa'), [])
+		self.assertEqual(flake8('# flake8=noqa'), [])
+		self.assertEqual(flake8('# flake8= noqa'), [])
+		self.assertEqual(flake8('# flake8=  noqa'), [])
 
 	def test_no_colon(self):
 		self.assertEqual(flake8('# FLAKE8 NOQA'), [
 			'1:1: NQA011 (flake8-noqa) "# FLAKE8 NOQA" must have a colon or equals, e.g. "# FLAKE8: NOQA"',
+		])
+		self.assertEqual(flake8('# FLAKE8  NOQA'), [
+			'1:1: NQA011 (flake8-noqa) "# FLAKE8  NOQA" must have a colon or equals, e.g. "# FLAKE8:  NOQA"',
+		])
+
+	def test_bad_colon(self):
+		self.assertEqual(flake8('# FLAKE8 :NOQA'), [
+			'1:1: NQA012 (flake8-noqa) "# FLAKE8 :NOQA" must not have a space before the colon, e.g. "# FLAKE8:NOQA"',
+		])
+		self.assertEqual(flake8('# FLAKE8 : NOQA'), [
+			'1:1: NQA012 (flake8-noqa) "# FLAKE8 : NOQA" must not have a space before the colon, e.g. "# FLAKE8: NOQA"',
+		])
+		self.assertEqual(flake8('# FLAKE8 = NOQA'), [
+			'1:1: NQA012 (flake8-noqa) "# FLAKE8 = NOQA" must not have a space before the equals, e.g. "# FLAKE8= NOQA"',
 		])
 
 	def test_no_space(self):
@@ -80,10 +99,26 @@ class TestInline(unittest.TestCase):
 		])
 		self.assertEqual(flake8('x=1 # noqa  E225'), [
 			'1:5: NQA002 (flake8-noqa) "# noqa  E225" must have a colon, e.g. "# noqa: E225"',
-			'1:5: NQA003 (flake8-noqa) "# noqa  E225" must have at most one space before the codes, e.g. "# noqa: E225"',
+			'1:5: NQA004 (flake8-noqa) "# noqa  E225" must have at most one space before the codes, e.g. "# noqa: E225"',
 		])
 		self.assertEqual(flake8('x=1 # noqa E225, E261'), [
 			'1:5: NQA002 (flake8-noqa) "# noqa E225, E261" must have a colon, e.g. "# noqa: E225, E261"',
+		])
+
+	def test_bad_colon(self):
+		self.assertEqual(flake8('x=1 # noqa : E225'), [
+			'1:5: NQA003 (flake8-noqa) "# noqa : E225" must not have a space before the colon, e.g. "# noqa: E225"',
+		])
+		self.assertEqual(flake8('x=1 #noqa : E225'), [
+			'1:5: NQA001 (flake8-noqa) "#noqa : E225" must have a single space after the hash, e.g. "# noqa: E225"',
+			'1:5: NQA003 (flake8-noqa) "#noqa : E225" must not have a space before the colon, e.g. "# noqa: E225"',
+		])
+		self.assertEqual(flake8('x=1 # noqa  :  E225'), [
+			'1:5: NQA003 (flake8-noqa) "# noqa  :  E225" must not have a space before the colon, e.g. "# noqa: E225"',
+			'1:5: NQA004 (flake8-noqa) "# noqa  :  E225" must have at most one space before the codes, e.g. "# noqa: E225"',
+		])
+		self.assertEqual(flake8('x=1 # noqa : E225, E261'), [
+			'1:5: NQA003 (flake8-noqa) "# noqa : E225, E261" must not have a space before the colon, e.g. "# noqa: E225, E261"',
 		])
 
 	def test_codes(self):
@@ -94,7 +129,7 @@ class TestInline(unittest.TestCase):
 			'1:5: NQA103 (flake8-noqa) "# noqa: E225, X101" has unmatched code, remove X101',
 		])
 		self.assertEqual(flake8('x=1 # noqa: E225, E225'), [
-			'1:5: NQA004 (flake8-noqa) "# noqa: E225, E225" has duplicate codes, remove E225',
+			'1:5: NQA005 (flake8-noqa) "# noqa: E225, E225" has duplicate codes, remove E225',
 		])
 
 	def test_require_code(self):

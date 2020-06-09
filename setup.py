@@ -42,6 +42,9 @@ setuptools.setup(
 			'flake8-type-annotations',
 			'pep8-naming',
 		],
+		'test': [
+			'flake8-docstrings',
+		],
 	},
 	classifiers=[
 		"Framework :: Flake8",

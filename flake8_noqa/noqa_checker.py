@@ -28,10 +28,12 @@ class Message(enum.Enum):
 
 	INLINE_NOQA_BAD_SPACE = (1, '"#{noqa}{sep}{codes}" must have a single space after the hash, e.g. "# {noqa_strip}{sep_codes_strip}"')
 	INLINE_NOQA_NO_COLON = (2, '"#{noqa}{codes}" must have a colon, e.g. "# {noqa_strip}: {codes_strip}"')
-	INLINE_NOQA_BAD_COLON_SPACE = (3, '"#{noqa}{sep}{codes}" must have at most one space before the codes, e.g. "# {noqa_strip}: {codes_strip}"')
-	INLINE_NOQA_DUPLICATE_CODE = (4, '"#{noqa}{sep}{codes}" has duplicate codes, remove {duplicates}')
+	INLINE_NOQA_BAD_COLON_SPACE = (3, '"#{noqa}{sep}{codes}" must not have a space before the colon, e.g. "# {noqa_strip}: {codes_strip}"')
+	INLINE_NOQA_BAD_CODE_SPACE = (4, '"#{noqa}{sep}{codes}" must have at most one space before the codes, e.g. "# {noqa_strip}: {codes_strip}"')
+	INLINE_NOQA_DUPLICATE_CODE = (5, '"#{noqa}{sep}{codes}" has duplicate codes, remove {duplicates}')
 	FILE_NOQA_BAD_SPACE = (10, '"#{flake8}{sep}{noqa}" must have a single space after the hash, e.g. "# {flake8_strip}{sep_colon}{noqa}"')
 	FILE_NOQA_NO_COLON = (11, '"#{flake8}{noqa}" must have a colon or equals, e.g. "# {flake8_strip}:{noqa}"')
+	FILE_NOQA_BAD_COLON_SPACE = (12, '"#{flake8}{sep}{noqa}" must not have a space before the {sep_name}, e.g. "# {flake8_strip}{sep_strip}{noqa}"')
 
 	@property
 	def code(self) -> str:
@@ -85,6 +87,13 @@ class NoqaChecker:
 					yield self._message(token, Message.FILE_NOQA_NO_COLON,
 					                    flake8=file_comment.flake8, flake8_strip=file_comment.flake8.strip(),
 					                    noqa=file_comment.noqa)
+				else:
+					if (not (file_comment.sep.startswith(':') or file_comment.sep.startswith('='))):
+						yield self._message(token, Message.FILE_NOQA_BAD_COLON_SPACE,
+						                    flake8=file_comment.flake8, flake8_strip=file_comment.flake8.strip(),
+						                    sep=file_comment.sep, sep_strip=file_comment.sep.strip(),
+						                    sep_name='colon' if (':' in file_comment.sep) else 'equals',
+						                    noqa=file_comment.noqa)
 
 			inline_comment = InlineComment.match(token, self.tokens[0])
 			if (inline_comment):
@@ -101,8 +110,15 @@ class NoqaChecker:
 						                    noqa=inline_comment.noqa, noqa_strip=inline_comment.noqa.strip(),
 						                    sep=inline_comment.sep,
 						                    codes=inline_comment.codes, codes_strip=inline_comment.codes.strip())
+					else:
+						if (not inline_comment.sep.startswith(':')):
+							yield self._message(token, Message.INLINE_NOQA_BAD_COLON_SPACE,
+							                    noqa=inline_comment.noqa, noqa_strip=inline_comment.noqa.strip(),
+							                    sep=inline_comment.sep,
+							                    codes=inline_comment.codes, codes_strip=inline_comment.codes.strip())
+
 					if ((inline_comment.codes != inline_comment.codes.strip()) and not SINGLE_SPACE.match(inline_comment.codes)):
-						yield self._message(token, Message.INLINE_NOQA_BAD_COLON_SPACE,
+						yield self._message(token, Message.INLINE_NOQA_BAD_CODE_SPACE,
 						                    noqa=inline_comment.noqa, noqa_strip=inline_comment.noqa.strip(),
 						                    sep=inline_comment.sep,
 						                    codes=inline_comment.codes, codes_strip=inline_comment.codes.strip())
