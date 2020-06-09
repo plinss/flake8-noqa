@@ -12,8 +12,7 @@ import flake8.utils
 
 
 NOQA_FILE = re.compile(r'\s*#(?P<flake8>\s*flake8)(?P<sep>\s*[:=])?(?P<noqa>(?:\b|\s*)noqa)', re.IGNORECASE)
-NOQA_INLINE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>\s*:)?', re.IGNORECASE)
-NOQA_INLINE_WITH_CODE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>\s*:)?(?P<codes>\s*([a-z]+[0-9]+(?:[,\s]+)?)+)', re.IGNORECASE)
+NOQA_INLINE = re.compile(r'#(?P<noqa>\s*noqa)\b(?P<sep>\s*:)?(?P<codes>\s*([a-z]+[0-9]+(?:[,\s]+)?)+)?', re.IGNORECASE)
 
 
 class FileComment:
@@ -79,9 +78,7 @@ class InlineComment:
 	def __init__(self, match: Match, token: tokenize.TokenInfo, line_start_token: tokenize.TokenInfo) -> None:
 		self.noqa = match.group('noqa')
 		self.sep = match.group('sep') or ''
-
-		code_match = NOQA_INLINE_WITH_CODE.match(token.string)
-		self.codes = code_match.group('codes') if (code_match) else ''
+		self.codes = match.group('codes') or ''
 
 		flake8_match = flake8.defaults.NOQA_INLINE_REGEXP.match(token.string)
 		self.valid = (flake8_match is not None)

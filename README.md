@@ -4,18 +4,22 @@
 flake8 plugin to validate `# noqa` comments.
 
 flake8 is very particular about formatting of `# noqa` comments.
-If your `# noqa` isn't exactly what flake8 expects, 
+If your `# noqa` isn't exactly what flake8 expects,
 it can easily cause your `# noqa` comment to be ignored.
 
 However, forgetting a colon or adding an extra space in the wrong place
-will turn a strict `# noqa: <code>` comment 
+will turn a strict `# noqa: <code>` comment
 into a blanket `# noqa` comment,
 which is likely not what you intended.
-For example: `# noqa F841`
+For example:
+`# noqa F841`,
+`# noqa : F841`,
+and `# noqa:  F841`
 will be interpreted as `# noqa`
-and may hide other errors you care about.
+and may, as a result,
+hide other errors you care about.
 
-This plugin looks for noqa comments 
+This plugin looks for noqa comments
 that do not match the proper formatting
 so your `# noqa` comments work and do only what you expect them to.
 
@@ -27,8 +31,14 @@ or they contain codes that do not match existing violations.
 
 Errors reported by this module cannot be prevented via `# noqa` comments,
 otherwise you'd never see many of the errors it produces.
-Use `ignore`, `extend-ignore`, or `per-file-ignores` to ignore them.
-
+Use `ignore`, `extend-ignore`, or `per-file-ignores` to ignore them as needed.
+Alternatively, if you have a comment that this plugin thinks is a
+`# noqa` with codes,
+but isn't,
+e.g. `# noqa : X100 is not a code`,
+you can make the comment look less like a proper `# noqa` comment.
+e.g. `# noqa - X100 is not a code`
+(flake8 will interpret both of those as `# noqa`).
 
 Installation
 ------------
@@ -63,15 +73,16 @@ Error Codes
 |--------|---------|
 | NQA001 | "`#noqa`" must have a single space after the hash, e.g. "`# noqa`" |
 | NQA002 | "`# noqa X000`" must have a colon, e.g. "`# noqa: X000`" |
-| NQA003 | "`# noqa:  X000`" must have at most one space before the codes, e.g. "`# noqa: X000`" |
-| NQA004 | "`# noqa: X000, X000`" has duplicate codes, remove X000 |
+| NQA003 | "`# noqa : X000`" must not have a space before the colon, e.g. "# noqa: X000"' |
+| NQA004 | "`# noqa:  X000`" must have at most one space before the codes, e.g. "`# noqa: X000`" |
+| NQA005 | "`# noqa: X000, X000`" has duplicate codes, remove X000 |
 | NQA010 | "`#flake8: noqa`" must have a single space after the hash, e.g. "`# flake8: noqa`" |
 | NQA011 | "`# flake8 noqa`" must have a colon or equals, e.g. "`# flake8: noqa`" |
+| NQA012 | "`# flake8 : noqa`" must not have a space before the colon, e.g. "# flake8: noqa" |
 | NQA101 | "`# noqa`" has no violations |
 | NQA102 | "`# noqa: X000`" has no matching violations |
 | NQA103 | "`# noqa: X000, X001`" has unmatched code(s), remove X001 |
 | NQA104 | "`# noqa`" must have codes, e.g. "`# noqa: X000`" (enable via `noqa-require-code`) |
-
 
 
 Examples
