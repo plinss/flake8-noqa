@@ -18,7 +18,7 @@ def flake8(test: str, options: List[str] = None) -> List[str]:
 	if (stderr):
 		return [f"0:0:{line}" for line in stderr.decode('utf-8').splitlines()]
 	# print(repr(test), repr([line.split(':', 1)[1] for line in stdout.decode('utf-8').splitlines()]))
-	return [line.split(':', 1)[1] for line in stdout.decode('utf-8').splitlines()]
+	return [(line.split(':', 1)[1] if (':' in line) else line) for line in stdout.decode('utf-8').splitlines()]
 
 
 class TestFileScope(unittest.TestCase):

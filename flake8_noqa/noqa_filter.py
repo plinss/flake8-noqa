@@ -51,31 +51,36 @@ class Report:
 
 
 class Violation(flake8.style_guide.Violation):
-    """Patch flake8 Violation class."""
+	"""Replacement for flake8's Violation class."""
 
-    def is_inline_ignored(self, disable_noqa: bool) -> bool:
-        """Always allow violations from this plugin."""
-        if (self.code.startswith(flake8_noqa.plugin_prefix)):
-        	return False
-        return super().is_inline_ignored(disable_noqa)
+	def is_inline_ignored(self, disable_noqa: bool, *args, **kwargs) -> bool:
+		"""Always allow violations from this plugin."""
+		if (self.code.startswith(flake8_noqa.plugin_prefix)):
+			return False
+		return super().is_inline_ignored(disable_noqa, *args, **kwargs)
 
 
 class FileChecker(flake8.checker.FileChecker):
-	"""Patch flake8 FileChecker class."""
+	"""Replacement for flake8's FileChecker."""
 
-	def run_ast_checks(self) -> None:
+	def run_ast_checks(self, *args, **kwargs) -> None:
 		"""Ensure this plugin is run last."""
 		for index, plugin in enumerate(self.checks['ast_plugins']):
 			if (flake8_noqa.noqa_filter_prefix == plugin['name']):
 				self.checks['ast_plugins'].pop(index)
 				self.checks['ast_plugins'].append(plugin)
 				break
-		super().run_ast_checks()
+		super().run_ast_checks(*args, **kwargs)
 
-	def report(self, error_code: Optional[str], line_number: int, column: int, text: str) -> str:
+	def report(self, error_code: Optional[str], line_number: int, column: int, text: str, *args, **kwargs) -> str:
 		"""Capture report information."""
 		Report.add_report(self.filename, error_code, line_number, column, text)
-		return super().report(error_code, line_number, column, text)
+		return super().report(error_code, line_number, column, text, *args, **kwargs)
+
+
+# patch flake8
+flake8.style_guide.Violation = Violation
+flake8.checker.FileChecker = FileChecker
 
 
 class Message(enum.Enum):
@@ -113,14 +118,7 @@ class NoqaFilter:
 	filename: str
 
 	@classmethod
-	def patch_flake8(cls) -> None:
-		"""Replace flake8's FileChecker and Violation classes."""
-		flake8.checker.FileChecker = FileChecker
-		flake8.style_guide.Violation = Violation
-
-	@classmethod
 	def add_options(cls, option_manager: flake8.options.manager.OptionManager) -> None:
-		cls.patch_flake8()
 		option_manager.add_option('--noqa-require-code', default=False, action='store_true',
 		                          parse_from_config=True, dest='noqa_require_code',
 		                          help='Require code(s) to be included in  "# noqa:" comments (disabled by default)')
