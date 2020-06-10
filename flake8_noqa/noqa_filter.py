@@ -50,39 +50,6 @@ class Report:
 		return reports
 
 
-class Violation(flake8.style_guide.Violation):
-	"""Replacement for flake8's Violation class."""
-
-	def is_inline_ignored(self, disable_noqa: bool, *args, **kwargs) -> bool:
-		"""Always allow violations from this plugin."""
-		if (self.code.startswith(flake8_noqa.plugin_prefix)):
-			return False
-		return super().is_inline_ignored(disable_noqa, *args, **kwargs)
-
-
-class FileChecker(flake8.checker.FileChecker):
-	"""Replacement for flake8's FileChecker."""
-
-	def run_ast_checks(self, *args, **kwargs) -> None:
-		"""Ensure this plugin is run last."""
-		for index, plugin in enumerate(self.checks['ast_plugins']):
-			if (flake8_noqa.noqa_filter_prefix == plugin['name']):
-				self.checks['ast_plugins'].pop(index)
-				self.checks['ast_plugins'].append(plugin)
-				break
-		super().run_ast_checks(*args, **kwargs)
-
-	def report(self, error_code: Optional[str], line_number: int, column: int, text: str, *args, **kwargs) -> str:
-		"""Capture report information."""
-		Report.add_report(self.filename, error_code, line_number, column, text)
-		return super().report(error_code, line_number, column, text, *args, **kwargs)
-
-
-# patch flake8
-flake8.style_guide.Violation = Violation
-flake8.checker.FileChecker = FileChecker
-
-
 class Message(enum.Enum):
 	"""Messages."""
 
@@ -113,6 +80,7 @@ class NoqaFilter:
 	version: ClassVar[str] = package_version
 	plugin_name: ClassVar[str]
 	require_code: ClassVar[bool]
+	_filters: ClassVar[List['NoqaFilter']] = []
 
 	tree: ast.AST
 	filename: str
@@ -137,15 +105,24 @@ class NoqaFilter:
 		cls.plugin_name = (' (' + cls.name + ')') if (options.noqa_include_name) else ''
 		cls.require_code = options.noqa_require_code
 
+	@classmethod
+	def filters(cls) -> Sequence['NoqaFilter']:
+		return cls._filters
+
 	def __init__(self, tree: ast.AST, filename: str) -> None:
 		self.tree = tree
 		self.filename = filename
+		self._filters.append(self)
+
+	def __iter__(self) -> Iterator[Tuple[int, int, str, Any]]:
+		"""Primary call from flake8, yield violations."""
+		return iter([])
 
 	def _message(self, token: tokenize.TokenInfo, message: Message, **kwargs) -> Tuple[int, int, str, Any]:
 		return (token.start[0], token.start[1], f'{message.code}{self.plugin_name} {message.text(**kwargs)}', type(self))
 
-	def __iter__(self) -> Iterator[Tuple[int, int, str, Any]]:
-		"""Primary call from flake8, yield error messages."""
+	def violations(self) -> Iterator[Tuple[int, int, str, Any]]:
+		"""Private iterator to return violations."""
 		for comment in InlineComment.file_comments(self.filename):
 			reports = Report.reports_from(self.filename, comment.start_line, comment.end_line)
 			comment_codes = set(comment.code_list)
@@ -173,3 +150,35 @@ class NoqaFilter:
 
 				else:
 					yield self._message(comment.token, Message.NOQA_NO_VIOLATIONS, comment=comment.text)
+
+
+class Violation(flake8.style_guide.Violation):
+	"""Replacement for flake8's Violation class."""
+
+	def is_inline_ignored(self, disable_noqa: bool, *args, **kwargs) -> bool:
+		"""Always allow violations from this plugin."""
+		if (self.code.startswith(flake8_noqa.plugin_prefix)):
+			return False
+		return super().is_inline_ignored(disable_noqa, *args, **kwargs)
+
+
+class FileChecker(flake8.checker.FileChecker):
+	"""Replacement for flake8's FileChecker."""
+
+	def run_checks(self, *args, **kwargs) -> Any:
+		"""Get voilations from NoqaFilter after all other checks are run."""
+		result = super().run_checks(*args, **kwargs)
+		for filter in NoqaFilter.filters():
+			for line_number, column, text, _ in filter.violations():
+				self.report(error_code=None, line_number=line_number, column=column, text=text)
+		return result
+
+	def report(self, error_code: Optional[str], line_number: int, column: int, text: str, *args, **kwargs) -> str:
+		"""Capture report information."""
+		Report.add_report(self.filename, error_code, line_number, column, text)
+		return super().report(error_code, line_number, column, text, *args, **kwargs)
+
+
+# patch flake8
+flake8.style_guide.Violation = Violation
+flake8.checker.FileChecker = FileChecker

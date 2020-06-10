@@ -40,6 +40,36 @@ you can make the comment look less like a proper `# noqa` comment.
 e.g. `# noqa - X100 is not a code`
 (flake8 will interpret both of those as `# noqa`).
 
+Usage Note:
+When determining if violations have matched a `# noqa` comment,
+this plugin requires flake8 to have been made aware of the violations
+that would otherwise apply.
+Some plugins do their own processing of `# noqa` comments 
+and stop sending violation reports to flake8 when they see a `# noqa` comment.
+A plugin doing so will cause this plugin to stop seeing the violation,
+and it may report the lack of a violation or matching code.
+When you then remove the `# noqa` comment or violation code, 
+the other plugin will resume sending the violation,
+prompting you to restore the `# noqa` comment or code.
+
+The best fix for this situation is to try to get the offending plugin
+to stop respecting `# noqa` comments.
+A plugin doing so is considered an anti-pattern,
+and it's best to allow flake8 to determine if violations should be 
+surfaced to the user or not.
+The offending plugin may have an option to control this behavior
+(note the flake8 `--disable-noqa` option will disable *all* noqa comments,
+so is not a suitable fix for this situation).
+If the plugin does not have an option to control its `# noqa` behavior, 
+the best course of action may be to contact the maintainers of 
+the plugin via the appropriate issue reporting system.
+
+If the plugin is unmaintained,
+or the maintainers decline to address the issue for whatever reason,
+feel free to file an issue on this plugin
+to see if a work-around can be established.
+
+
 Installation
 ------------
 
