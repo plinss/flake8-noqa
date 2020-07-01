@@ -31,9 +31,9 @@ class Message(enum.Enum):
 	INLINE_NOQA_BAD_COLON_SPACE = (3, '"#{noqa}{sep}{codes}" must not have a space before the colon, e.g. "# {noqa_strip}: {codes_strip}"')
 	INLINE_NOQA_BAD_CODE_SPACE = (4, '"#{noqa}{sep}{codes}" must have at most one space before the codes, e.g. "# {noqa_strip}: {codes_strip}"')
 	INLINE_NOQA_DUPLICATE_CODE = (5, '"#{noqa}{sep}{codes}" has duplicate codes, remove {duplicates}')
-	FILE_NOQA_BAD_SPACE = (10, '"#{flake8}{sep}{noqa}" must have a single space after the hash, e.g. "# {flake8_strip}{sep_colon}{noqa}"')
-	FILE_NOQA_NO_COLON = (11, '"#{flake8}{noqa}" must have a colon or equals, e.g. "# {flake8_strip}:{noqa}"')
-	FILE_NOQA_BAD_COLON_SPACE = (12, '"#{flake8}{sep}{noqa}" must not have a space before the {sep_name}, e.g. "# {flake8_strip}{sep_strip}{noqa}"')
+	FILE_NOQA_BAD_SPACE = (11, '"#{flake8}{sep}{noqa}" must have a single space after the hash, e.g. "# {flake8_strip}{sep_colon}{noqa}"')
+	FILE_NOQA_NO_COLON = (12, '"#{flake8}{noqa}" must have a colon or equals, e.g. "# {flake8_strip}:{noqa}"')
+	FILE_NOQA_BAD_COLON_SPACE = (13, '"#{flake8}{sep}{noqa}" must not have a space before the {sep_name}, e.g. "# {flake8_strip}{sep_strip}{noqa}"')
 
 	@property
 	def code(self) -> str:

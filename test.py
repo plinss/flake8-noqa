@@ -34,27 +34,27 @@ class TestFileScope(unittest.TestCase):
 
 	def test_no_colon(self):
 		self.assertEqual(flake8('# FLAKE8 NOQA'), [
-			'1:1: NQA011 (flake8-noqa) "# FLAKE8 NOQA" must have a colon or equals, e.g. "# FLAKE8: NOQA"',
+			'1:1: NQA012 (flake8-noqa) "# FLAKE8 NOQA" must have a colon or equals, e.g. "# FLAKE8: NOQA"',
 		])
 		self.assertEqual(flake8('# FLAKE8  NOQA'), [
-			'1:1: NQA011 (flake8-noqa) "# FLAKE8  NOQA" must have a colon or equals, e.g. "# FLAKE8:  NOQA"',
+			'1:1: NQA012 (flake8-noqa) "# FLAKE8  NOQA" must have a colon or equals, e.g. "# FLAKE8:  NOQA"',
 		])
 
 	def test_bad_colon(self):
 		self.assertEqual(flake8('# FLAKE8 :NOQA'), [
-			'1:1: NQA012 (flake8-noqa) "# FLAKE8 :NOQA" must not have a space before the colon, e.g. "# FLAKE8:NOQA"',
+			'1:1: NQA013 (flake8-noqa) "# FLAKE8 :NOQA" must not have a space before the colon, e.g. "# FLAKE8:NOQA"',
 		])
 		self.assertEqual(flake8('# FLAKE8 : NOQA'), [
-			'1:1: NQA012 (flake8-noqa) "# FLAKE8 : NOQA" must not have a space before the colon, e.g. "# FLAKE8: NOQA"',
+			'1:1: NQA013 (flake8-noqa) "# FLAKE8 : NOQA" must not have a space before the colon, e.g. "# FLAKE8: NOQA"',
 		])
 		self.assertEqual(flake8('# FLAKE8 = NOQA'), [
-			'1:1: NQA012 (flake8-noqa) "# FLAKE8 = NOQA" must not have a space before the equals, e.g. "# FLAKE8= NOQA"',
+			'1:1: NQA013 (flake8-noqa) "# FLAKE8 = NOQA" must not have a space before the equals, e.g. "# FLAKE8= NOQA"',
 		])
 
 	def test_no_space(self):
 		self.assertEqual(flake8('#flake8 noqa'), [
-			'1:1: NQA010 (flake8-noqa) "#flake8 noqa" must have a single space after the hash, e.g. "# flake8: noqa"',
-			'1:1: NQA011 (flake8-noqa) "#flake8 noqa" must have a colon or equals, e.g. "# flake8: noqa"',
+			'1:1: NQA011 (flake8-noqa) "#flake8 noqa" must have a single space after the hash, e.g. "# flake8: noqa"',
+			'1:1: NQA012 (flake8-noqa) "#flake8 noqa" must have a colon or equals, e.g. "# flake8: noqa"',
 		])
 
 
