@@ -109,6 +109,10 @@ class NoqaFilter:
 	def filters(cls) -> Sequence['NoqaFilter']:
 		return cls._filters
 
+	@classmethod
+	def clear_filters(cls) -> None:
+		cls._filters = []
+
 	def __init__(self, tree: ast.AST, filename: str) -> None:
 		self.tree = tree
 		self.filename = filename
@@ -171,6 +175,7 @@ class FileChecker(flake8.checker.FileChecker):
 		for filter in NoqaFilter.filters():
 			for line_number, column, text, _ in filter.violations():
 				self.report(error_code=None, line_number=line_number, column=column, text=text)
+		NoqaFilter.clear_filters()
 		return result
 
 	def report(self, error_code: Optional[str], line_number: int, column: int, text: str, *args, **kwargs) -> str:
