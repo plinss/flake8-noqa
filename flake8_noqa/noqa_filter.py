@@ -93,7 +93,7 @@ class NoqaFilter:
 		option_manager.add_option('--noqa-no-require-code', default=False, action='store_false',
 		                          parse_from_config=True, dest='noqa_require_code',
 		                          help='Do not require code(s) in "# noqa" comments')
-		option_manager.add_option('--noqa-include-name', default=True, action='store_true',
+		option_manager.add_option('--noqa-include-name', default=False, action='store_true',
 		                          parse_from_config=True, dest='noqa_include_name',
 		                          help='Include plugin name in messages (enabled by default)')
 		option_manager.add_option('--noqa-no-include-name', default=None, action='store_false',

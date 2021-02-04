@@ -27,7 +27,7 @@ mypy:
     - mypy ${PACKAGE_NAME}
 
 
-test3_6:
+test3.6:
   stage: test
   image: python:3.6
   before_script:
@@ -41,7 +41,7 @@ test3_6:
         - test.py
 
 
-test3_7:
+test3.7:
   stage: test
   image: python:3.7
   before_script:
@@ -55,7 +55,7 @@ test3_7:
         - test.py
 
 
-test3_8:
+test3.8:
   stage: test
   image: python:3.8
   before_script:

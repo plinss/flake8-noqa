@@ -2,12 +2,12 @@
 
 # update the version information in setup.py to the current git tag
 # this should only be called during a CI build
-# do NOT commit any version other than 0.0.0 in setup.py
+# do NOT commit any version info in setup.py
 
 TAGS=$(git describe --all --tags)
 TAG=${TAGS##*/}
 
-if [[ ! "${TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-]*)*$ ]]; then
+if [[ ! "${TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[-\.a-zA-Z0-9]+)?$ ]]; then
 	echo "Not a version tag"
 	exit 0
 fi

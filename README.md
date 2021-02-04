@@ -87,10 +87,10 @@ Options
 : Do not require code(s) in `# noqa` comments (default setting)
 
 `noqa-include-name`
-: Include plugin name in messages (default setting)
+: Include plugin name in messages
 
 `noqa-no-include-name`
-: Remove plugin name from messages
+: Do not include plugin name in messages (default setting)
 
 All options may be specified on the command line with a `--` prefix,
 or can be placed in your flake8 config file.
