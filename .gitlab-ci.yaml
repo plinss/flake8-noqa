@@ -83,6 +83,20 @@ test3.9:
         - test.py
 
 
+test3.10:
+  stage: test
+  image: python:3.10
+  before_script:
+    - source .gitlab-ci.env
+    - pip install -e ".[test]"
+    - chmod a+x test.py
+  script:
+    - ./test.py
+  rules:
+    - exists:
+        - test.py
+
+
 package:
   stage: package
   before_script:
