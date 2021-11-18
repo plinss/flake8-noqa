@@ -22,7 +22,7 @@ setuptools.setup(
 
 	install_requires=[
 		'flake8>=3.8.0,<5.0',
-		'typing_extensions>=3.7.4.2,<4.0',
+		'typing_extensions>=3.7.4.2,<5.0',
 	],
 	extras_require={
 		'dev': [
