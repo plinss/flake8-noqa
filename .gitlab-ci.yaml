@@ -105,6 +105,7 @@ package:
     - tools/set_version
     - pip install --upgrade wheel
   script:
+    - python setup.py sdist
     - python setup.py bdist_wheel
   artifacts:
     paths:
