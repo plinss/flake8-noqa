@@ -3,7 +3,7 @@
 	[
 		{
 			"path": ".",
-			"folder_exclude_patterns": [".mypy_cache", "*.egg-info"],
+			"folder_exclude_patterns": ["dist", "__pycache__", ".mypy_cache", "*.egg-info"],
 			"file_exclude_patterns": ["*.orig"]
 		}
 	]
