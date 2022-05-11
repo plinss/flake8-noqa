@@ -104,7 +104,7 @@ Error Codes
 | NQA001 | "`#noqa`" must have a single space after the hash, e.g. "`# noqa`" |
 | NQA002 | "`# noqa X000`" must have a colon, e.g. "`# noqa: X000`" |
 | NQA003 | "`# noqa : X000`" must not have a space before the colon, e.g. "# noqa: X000"' |
-| NQA004 | "`# noqa:  X000`" must have at most one space before the codes, e.g. "`# noqa: X000`" |
+| NQA004 | "`# noqa:␣␣X000`" must have at most one space before the codes, e.g. "`# noqa: X000`" |
 | NQA005 | "`# noqa: X000, X000`" has duplicate codes, remove X000 |
 | NQA011 | "`#flake8: noqa`" must have a single space after the hash, e.g. "`# flake8: noqa`" |
 | NQA012 | "`# flake8 noqa`" must have a colon or equals, e.g. "`# flake8: noqa`" |
