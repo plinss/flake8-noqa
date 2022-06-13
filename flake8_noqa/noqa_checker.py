@@ -95,7 +95,7 @@ class NoqaChecker:
 						                    sep_name='colon' if (':' in file_comment.sep) else 'equals',
 						                    noqa=file_comment.noqa)
 
-			inline_comment = InlineComment.match(token, self.tokens[0])
+			inline_comment = InlineComment.match(token)
 			if (inline_comment):
 				noqa_filter.InlineComment.add_comment(self.filename, inline_comment)
 				if (not inline_comment.valid):

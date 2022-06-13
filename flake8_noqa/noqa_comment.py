@@ -50,16 +50,15 @@ class InlineComment:
 	codes: str
 	valid: bool
 	flake8_codes: str
-	start_line: int
 	token: tokenize.TokenInfo
 
 	@classmethod
-	def match(cls, token: tokenize.TokenInfo, line_start_token: tokenize.TokenInfo) -> Optional['InlineComment']:
+	def match(cls, token: tokenize.TokenInfo) -> Optional['InlineComment']:
 		"""Create an InlineComment if it matches the token."""
 		match = NOQA_INLINE.match(token.string)
 		if (not match):
 			return None
-		return InlineComment(match, token, line_start_token)
+		return InlineComment(match, token)
 
 	@classmethod
 	def add_comment(cls, filename: str, comment: 'InlineComment') -> None:
@@ -75,7 +74,7 @@ class InlineComment:
 			return comment.start_line
 		return sorted(cls.comments.get(filename, []), key=start_line)
 
-	def __init__(self, match: Match, token: tokenize.TokenInfo, line_start_token: tokenize.TokenInfo) -> None:
+	def __init__(self, match: Match, token: tokenize.TokenInfo) -> None:
 		self.noqa = match.group('noqa')
 		self.sep = match.group('sep') or ''
 		self.codes = match.group('codes') or ''
@@ -84,8 +83,11 @@ class InlineComment:
 		self.valid = (flake8_match is not None)
 		self.flake8_codes = (flake8_match.group('codes') or '') if (flake8_match is not None) else ''
 
-		self.start_line = line_start_token.start[0]
 		self.token = token
+
+	@property
+	def start_line(self) -> int:
+		return self.token.start[0]
 
 	@property
 	def end_line(self) -> int:
