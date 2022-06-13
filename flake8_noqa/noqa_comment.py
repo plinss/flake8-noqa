@@ -87,23 +87,29 @@ class InlineComment:
 
 	@property
 	def start_line(self) -> int:
+		"""Get starting line of comment."""
 		return self.token.start[0]
 
 	@property
 	def end_line(self) -> int:
+		"""Get ending line of comment."""
 		return self.token.start[0]
 
 	@property
 	def text(self) -> str:
+		"""Reconstruct comment as text."""
 		return f'#{self.noqa}{self.sep}{self.codes}'
 
 	@property
 	def code_list(self) -> Sequence[str]:
+		"""Get list of all violation codes."""
 		return flake8.utils.parse_comma_separated_list(self.codes) if (self.codes) else []
 
 	@property
 	def flake8_code_list(self) -> Sequence[str]:
+		"""Get list of violation codes honoroed by flake8."""
 		return flake8.utils.parse_comma_separated_list(self.flake8_codes) if (self.flake8_codes) else []
 
 	def __repr__(self) -> str:
+		"""Debug representation."""
 		return f'{self.start_line}-{self.end_line}:{self.codes}'

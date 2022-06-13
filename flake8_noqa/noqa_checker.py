@@ -37,9 +37,11 @@ class Message(enum.Enum):
 
 	@property
 	def code(self) -> str:
+		"""Get code for message."""
 		return (flake8_noqa.noqa_checker_prefix + str(self.value[0]).rjust(6 - len(flake8_noqa.noqa_checker_prefix), '0'))
 
 	def text(self, **kwargs) -> str:
+		"""Get formatted text of message."""
 		return self.value[1].format(**kwargs)
 
 
@@ -61,6 +63,7 @@ class NoqaChecker:
 
 	@classmethod
 	def parse_options(cls, options: Options) -> None:
+		"""Parse plugin options."""
 		cls.plugin_name = (' (' + cls.name + ')') if (options.noqa_include_name) else ''
 
 	def __init__(self, logical_line: str, tokens: Sequence[tokenize.TokenInfo], filename: str) -> None:

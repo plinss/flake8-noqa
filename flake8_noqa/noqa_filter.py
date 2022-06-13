@@ -32,7 +32,7 @@ class Report:
 
 	@classmethod
 	def add_report(cls, filename: str, error_code: Optional[str], line_number: int, column: int, text: str) -> None:
-		"""Add report to master list."""
+		"""Add violation report to master list."""
 		code = error_code if (error_code is not None) else text.split(' ', 1)[0]
 		if (code.startswith(flake8_noqa.plugin_prefix)):
 			return
@@ -44,6 +44,7 @@ class Report:
 
 	@classmethod
 	def reports_from(cls, filename: str, start_line: int, end_line: int) -> Sequence[str]:
+		"""Get all volation reports for a range of lines."""
 		reports: List[str] = []
 		for line_number in range(start_line, end_line + 1):
 			reports += cls.reports.get(filename, {}).get(line_number, [])
@@ -60,9 +61,11 @@ class Message(enum.Enum):
 
 	@property
 	def code(self) -> str:
+		"""Get code for message."""
 		return (flake8_noqa.noqa_filter_prefix + str(self.value[0]).rjust(6 - len(flake8_noqa.noqa_filter_prefix), '0'))
 
 	def text(self, **kwargs) -> str:
+		"""Get formatted text of message."""
 		return self.value[1].format(**kwargs)
 
 
@@ -87,6 +90,7 @@ class NoqaFilter:
 
 	@classmethod
 	def add_options(cls, option_manager: flake8.options.manager.OptionManager) -> None:
+		"""Add plugin options to option manager."""
 		option_manager.add_option('--noqa-require-code', default=False, action='store_true',
 		                          parse_from_config=True, dest='noqa_require_code',
 		                          help='Require code(s) to be included in  "# noqa:" comments (disabled by default)')
@@ -102,15 +106,18 @@ class NoqaFilter:
 
 	@classmethod
 	def parse_options(cls, options: Options) -> None:
+		"""Parse plugin options."""
 		cls.plugin_name = (' (' + cls.name + ')') if (options.noqa_include_name) else ''
 		cls.require_code = options.noqa_require_code
 
 	@classmethod
 	def filters(cls) -> Sequence['NoqaFilter']:
+		"""Get all filters."""
 		return cls._filters
 
 	@classmethod
 	def clear_filters(cls) -> None:
+		"""Clear filters."""
 		cls._filters = []
 
 	def __init__(self, tree: ast.AST, filename: str) -> None:
@@ -160,7 +167,7 @@ class Violation(flake8.style_guide.Violation):
 	"""Replacement for flake8's Violation class."""
 
 	def is_inline_ignored(self, disable_noqa: bool, *args, **kwargs) -> bool:
-		"""Always allow violations from this plugin."""
+		"""Prevent violations from this plugin from being ignored."""
 		if (self.code.startswith(flake8_noqa.plugin_prefix)):
 			return False
 		return super().is_inline_ignored(disable_noqa, *args, **kwargs)
