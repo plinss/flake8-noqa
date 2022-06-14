@@ -27,20 +27,6 @@ mypy:
     - mypy ${PACKAGE_NAME}
 
 
-test_3.6:
-  stage: test
-  image: python:3.6
-  before_script:
-    - source .gitlab-ci.env
-    - pip install -e ".[test]"
-    - chmod a+x test.py
-  script:
-    - ./test.py
-  rules:
-    - exists:
-        - test.py
-
-
 test_3.7:
   stage: test
   image: python:3.7

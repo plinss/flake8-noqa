@@ -1,5 +1,7 @@
 """Checker for noqa comments."""
 
+from __future__ import annotations
+
 import enum
 import re
 import tokenize

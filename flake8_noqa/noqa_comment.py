@@ -1,14 +1,18 @@
 """Filter for errors masked by noqa comments."""
 
+from __future__ import annotations
+
 import re
-import tokenize
-from typing import ClassVar, Dict, List, Match, Optional, Sequence
+from typing import ClassVar, Dict, List, Match, Optional, Sequence, TYPE_CHECKING
 
 import flake8.checker
 import flake8.defaults
 import flake8.options.manager
 import flake8.style_guide
 import flake8.utils
+
+if (TYPE_CHECKING):
+	import tokenize
 
 
 NOQA_FILE = re.compile(r'\s*#(?P<flake8>\s*flake8)(?P<sep>\s*[:=])?(?P<noqa>(?:\b|\s*)noqa)', re.IGNORECASE)
@@ -25,7 +29,7 @@ class FileComment:
 	token: tokenize.TokenInfo
 
 	@classmethod
-	def match(cls, token: tokenize.TokenInfo) -> Optional['FileComment']:
+	def match(cls, token: tokenize.TokenInfo) -> Optional[FileComment]:
 		"""Create a FileComment if it matches the token."""
 		match = NOQA_FILE.match(token.string)
 		if (not match):
@@ -43,7 +47,7 @@ class FileComment:
 class InlineComment:
 	"""noqa comment info."""
 
-	comments: ClassVar[Dict[str, List['InlineComment']]] = {}
+	comments: ClassVar[Dict[str, List[InlineComment]]] = {}
 
 	noqa: str
 	sep: str
@@ -53,7 +57,7 @@ class InlineComment:
 	token: tokenize.TokenInfo
 
 	@classmethod
-	def match(cls, token: tokenize.TokenInfo) -> Optional['InlineComment']:
+	def match(cls, token: tokenize.TokenInfo) -> Optional[InlineComment]:
 		"""Create an InlineComment if it matches the token."""
 		match = NOQA_INLINE.match(token.string)
 		if (not match):
@@ -61,14 +65,14 @@ class InlineComment:
 		return InlineComment(match, token)
 
 	@classmethod
-	def add_comment(cls, filename: str, comment: 'InlineComment') -> None:
+	def add_comment(cls, filename: str, comment: InlineComment) -> None:
 		"""Add comment to master list."""
 		if (filename not in cls.comments):
 			cls.comments[filename] = []
 		cls.comments[filename].append(comment)
 
 	@classmethod
-	def file_comments(cls, filename: str) -> Sequence['InlineComment']:
+	def file_comments(cls, filename: str) -> Sequence[InlineComment]:
 		"""Get comments for file."""
 		def start_line(comment: InlineComment) -> int:
 			return comment.start_line

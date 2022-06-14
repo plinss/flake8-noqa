@@ -1,9 +1,9 @@
 """Filter for errors masked by noqa comments."""
 
-import ast
+from __future__ import annotations
+
 import enum
-import tokenize
-from typing import Any, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Any, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, TYPE_CHECKING, Tuple
 
 import flake8.checker
 import flake8.defaults
@@ -16,6 +16,10 @@ import flake8_noqa
 from typing_extensions import Protocol
 
 from .noqa_comment import InlineComment
+
+if (TYPE_CHECKING):
+	import ast
+	import tokenize
 
 
 try:
@@ -83,7 +87,7 @@ class NoqaFilter:
 	version: ClassVar[str] = package_version
 	plugin_name: ClassVar[str]
 	require_code: ClassVar[bool]
-	_filters: ClassVar[List['NoqaFilter']] = []
+	_filters: ClassVar[List[NoqaFilter]] = []
 
 	tree: ast.AST
 	filename: str
@@ -111,7 +115,7 @@ class NoqaFilter:
 		cls.require_code = options.noqa_require_code
 
 	@classmethod
-	def filters(cls) -> Sequence['NoqaFilter']:
+	def filters(cls) -> Sequence[NoqaFilter]:
 		"""Get all filters."""
 		return cls._filters
 
