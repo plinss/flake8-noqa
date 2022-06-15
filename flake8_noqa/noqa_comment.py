@@ -60,7 +60,7 @@ class InlineComment:
 	@classmethod
 	def match(cls, token: TokenInfo, prev_token: TokenInfo = None) -> Optional[InlineComment]:
 		"""Create an InlineComment if it matches the token."""
-		match = NOQA_INLINE.match(token.string)
+		match = NOQA_INLINE.search(token.string)
 		if (not match):
 			return None
 		return InlineComment(match, token, prev_token)
@@ -84,7 +84,7 @@ class InlineComment:
 		self.sep = match.group('sep') or ''
 		self.codes = match.group('codes') or ''
 
-		flake8_match = flake8.defaults.NOQA_INLINE_REGEXP.match(token.string)
+		flake8_match = flake8.defaults.NOQA_INLINE_REGEXP.search(token.string)
 		self.valid = (flake8_match is not None)
 		self.flake8_codes = (flake8_match.group('codes') or '') if (flake8_match is not None) else ''
 

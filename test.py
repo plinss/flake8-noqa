@@ -133,6 +133,11 @@ class TestInline(unittest.TestCase):
 			'1:5: NQA005 "# noqa: E225, E225" has duplicate codes, remove E225',
 		])
 
+	def test_double(self) -> None:
+		self.assertEqual(flake8('x=1 # type: ignore[type] # noqa: X101'), [
+			'1:5: NQA102 "# noqa: X101" has no matching violations',
+		])
+
 	def test_require_code(self) -> None:
 		self.assertEqual(flake8('x=1 # noqa', ['--noqa-require-code']), [
 			'1:5: NQA104 "# noqa" must have codes, e.g. "# noqa: D100, E225, E261, W292"',
