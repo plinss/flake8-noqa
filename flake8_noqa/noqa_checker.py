@@ -77,8 +77,10 @@ class NoqaChecker:
 
 	def __iter__(self) -> Iterator[Tuple[Tuple[int, int], str]]:
 		"""Primary call from flake8, yield error messages."""
+		prev_token = None
 		for token in self.tokens:
 			if (tokenize.COMMENT != token.type):
+				prev_token = token
 				continue
 
 			file_comment = FileComment.match(token)
@@ -100,7 +102,7 @@ class NoqaChecker:
 						                    sep_name='colon' if (':' in file_comment.sep) else 'equals',
 						                    noqa=file_comment.noqa)
 
-			inline_comment = InlineComment.match(token)
+			inline_comment = InlineComment.match(token, prev_token)
 			if (inline_comment):
 				noqa_filter.InlineComment.add_comment(self.filename, inline_comment)
 				if (not inline_comment.valid):

@@ -12,7 +12,7 @@ import flake8.style_guide
 import flake8.utils
 
 if (TYPE_CHECKING):
-	import tokenize
+	from tokenize import TokenInfo
 
 
 NOQA_FILE = re.compile(r'\s*#(?P<flake8>\s*flake8)(?P<sep>\s*[:=])?(?P<noqa>(?:\b|\s*)noqa)', re.IGNORECASE)
@@ -26,17 +26,17 @@ class FileComment:
 	sep: str
 	noqa: str
 	valid: bool
-	token: tokenize.TokenInfo
+	token: TokenInfo
 
 	@classmethod
-	def match(cls, token: tokenize.TokenInfo) -> Optional[FileComment]:
+	def match(cls, token: TokenInfo) -> Optional[FileComment]:
 		"""Create a FileComment if it matches the token."""
 		match = NOQA_FILE.match(token.string)
 		if (not match):
 			return None
 		return FileComment(match, token)
 
-	def __init__(self, match: Match, token: tokenize.TokenInfo) -> None:
+	def __init__(self, match: Match, token: TokenInfo) -> None:
 		self.flake8 = match.group('flake8')
 		self.sep = match.group('sep') or ''
 		self.noqa = match.group('noqa')
@@ -54,15 +54,16 @@ class InlineComment:
 	codes: str
 	valid: bool
 	flake8_codes: str
-	token: tokenize.TokenInfo
+	token: TokenInfo
+	start_line: int
 
 	@classmethod
-	def match(cls, token: tokenize.TokenInfo) -> Optional[InlineComment]:
+	def match(cls, token: TokenInfo, prev_token: TokenInfo = None) -> Optional[InlineComment]:
 		"""Create an InlineComment if it matches the token."""
 		match = NOQA_INLINE.match(token.string)
 		if (not match):
 			return None
-		return InlineComment(match, token)
+		return InlineComment(match, token, prev_token)
 
 	@classmethod
 	def add_comment(cls, filename: str, comment: InlineComment) -> None:
@@ -78,7 +79,7 @@ class InlineComment:
 			return comment.start_line
 		return sorted(cls.comments.get(filename, []), key=start_line)
 
-	def __init__(self, match: Match, token: tokenize.TokenInfo) -> None:
+	def __init__(self, match: Match, token: TokenInfo, prev_token: TokenInfo = None) -> None:
 		self.noqa = match.group('noqa')
 		self.sep = match.group('sep') or ''
 		self.codes = match.group('codes') or ''
@@ -88,11 +89,7 @@ class InlineComment:
 		self.flake8_codes = (flake8_match.group('codes') or '') if (flake8_match is not None) else ''
 
 		self.token = token
-
-	@property
-	def start_line(self) -> int:
-		"""Get starting line of comment."""
-		return self.token.start[0]
+		self.start_line = prev_token.start[0] if (prev_token is not None) else token.start[0]
 
 	@property
 	def end_line(self) -> int:
