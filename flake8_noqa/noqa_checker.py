@@ -16,9 +16,12 @@ from .noqa_comment import FileComment, InlineComment
 
 
 try:
-	import pkg_resources
-	package_version = pkg_resources.get_distribution(__package__).version
-except pkg_resources.DistributionNotFound:
+	try:
+		from importlib.metadata import version
+	except ModuleNotFoundError:  # python < 3.8 use polyfill
+		from importlib_metadata import version  # type: ignore
+	package_version = version(__package__)
+except Exception:
 	package_version = 'unknown'
 
 
