@@ -41,7 +41,7 @@ setuptools.setup(
 			'flake8-literal',
 			'flake8-noqa',
 			'flake8-polyfill',
-			'flake8-postponed-annotations',
+			'flake8-modern-annotations',
 			'flake8-requirements',
 			# 'flake8-smart-tabs',
 			'flake8-tabs',
@@ -50,7 +50,6 @@ setuptools.setup(
 			'pep8-naming',
 		],
 		'test': [
-			'flake8-docstrings',
 		],
 	},
 	classifiers=[

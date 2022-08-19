@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, ClassVar, Dict, Iterator, List, Optional, Sequence, Set, TYPE_CHECKING, Tuple
+from typing import Any, ClassVar, TYPE_CHECKING
 
 import flake8.checker
 import flake8.defaults
@@ -20,6 +20,7 @@ from .noqa_comment import InlineComment
 if (TYPE_CHECKING):
 	import ast
 	import tokenize
+	from collections.abc import Iterator, Sequence
 
 
 try:
@@ -35,10 +36,10 @@ except Exception:
 class Report:
 	"""Violation report info."""
 
-	reports: ClassVar[Dict[str, Dict[int, List[str]]]] = {}
+	reports: ClassVar[dict[str, dict[int, list[str]]]] = {}
 
 	@classmethod
-	def add_report(cls, filename: str, error_code: Optional[str], line_number: int, column: int, text: str) -> None:
+	def add_report(cls, filename: str, error_code: (str | None), line_number: int, column: int, text: str) -> None:
 		"""Add violation report to master list."""
 		code = error_code if (error_code is not None) else text.split(' ', 1)[0]
 		if (code.startswith(flake8_noqa.plugin_prefix)):
@@ -52,7 +53,7 @@ class Report:
 	@classmethod
 	def reports_from(cls, filename: str, start_line: int, end_line: int) -> Sequence[str]:
 		"""Get all volation reports for a range of lines."""
-		reports: List[str] = []
+		reports: list[str] = []
 		for line_number in range(start_line, end_line + 1):
 			reports += cls.reports.get(filename, {}).get(line_number, [])
 		return reports
@@ -90,7 +91,7 @@ class NoqaFilter:
 	version: ClassVar[str] = package_version
 	plugin_name: ClassVar[str]
 	require_code: ClassVar[bool]
-	_filters: ClassVar[List[NoqaFilter]] = []
+	_filters: ClassVar[list[NoqaFilter]] = []
 
 	tree: ast.AST
 	filename: str
@@ -132,20 +133,20 @@ class NoqaFilter:
 		self.filename = filename
 		self._filters.append(self)
 
-	def __iter__(self) -> Iterator[Tuple[int, int, str, Any]]:
+	def __iter__(self) -> Iterator[tuple[int, int, str, Any]]:
 		"""Primary call from flake8, yield violations."""
 		return iter([])
 
-	def _message(self, token: tokenize.TokenInfo, message: Message, **kwargs) -> Tuple[int, int, str, Any]:
+	def _message(self, token: tokenize.TokenInfo, message: Message, **kwargs) -> tuple[int, int, str, Any]:
 		return (token.start[0], token.start[1], f'{message.code}{self.plugin_name} {message.text(**kwargs)}', type(self))
 
-	def violations(self) -> Iterator[Tuple[int, int, str, Any]]:
+	def violations(self) -> Iterator[tuple[int, int, str, Any]]:
 		"""Private iterator to return violations."""
 		for comment in InlineComment.file_comments(self.filename):
 			reports = Report.reports_from(self.filename, comment.start_line, comment.end_line)
 			comment_codes = set(comment.code_list)
 			if (comment_codes):
-				matched_codes: Set[str] = set()
+				matched_codes: set[str] = set()
 				for code in reports:
 					if (code in comment_codes):
 						matched_codes.add(code)
@@ -192,7 +193,7 @@ class FileChecker(flake8.checker.FileChecker):
 		NoqaFilter.clear_filters()
 		return result
 
-	def report(self, error_code: Optional[str], line_number: int, column: int, text: str, *args, **kwargs) -> str:
+	def report(self, error_code: (str | None), line_number: int, column: int, text: str, *args, **kwargs) -> str:
 		"""Capture report information."""
 		Report.add_report(self.filename, error_code, line_number, column, text)
 		return super().report(error_code, line_number, column, text, *args, **kwargs)

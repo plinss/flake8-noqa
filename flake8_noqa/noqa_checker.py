@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 import re
 import tokenize
-from typing import ClassVar, Iterator, Sequence, Tuple
+from typing import ClassVar, TYPE_CHECKING
 
 import flake8_noqa
 
@@ -14,6 +14,8 @@ from typing_extensions import Protocol
 from . import noqa_filter
 from .noqa_comment import FileComment, InlineComment
 
+if (TYPE_CHECKING):
+	from collections.abc import Iterator, Sequence
 
 try:
 	try:
@@ -75,10 +77,10 @@ class NoqaChecker:
 		self.tokens = tokens
 		self.filename = filename
 
-	def _message(self, token: tokenize.TokenInfo, message: Message, **kwargs) -> Tuple[Tuple[int, int], str]:
+	def _message(self, token: tokenize.TokenInfo, message: Message, **kwargs) -> tuple[tuple[int, int], str]:
 		return (token.start, f'{message.code}{self.plugin_name} {message.text(**kwargs)}')
 
-	def __iter__(self) -> Iterator[Tuple[Tuple[int, int], str]]:
+	def __iter__(self) -> Iterator[tuple[tuple[int, int], str]]:
 		"""Primary call from flake8, yield error messages."""
 		prev_token = None
 		for token in self.tokens:

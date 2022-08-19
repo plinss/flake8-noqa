@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import ClassVar, Dict, List, Match, Optional, Sequence, TYPE_CHECKING
+from typing import ClassVar, TYPE_CHECKING
 
 import flake8.checker
 import flake8.defaults
@@ -12,6 +12,7 @@ import flake8.style_guide
 import flake8.utils
 
 if (TYPE_CHECKING):
+	from collections.abc import Sequence
 	from tokenize import TokenInfo
 
 
@@ -29,14 +30,14 @@ class FileComment:
 	token: TokenInfo
 
 	@classmethod
-	def match(cls, token: TokenInfo) -> Optional[FileComment]:
+	def match(cls, token: TokenInfo) -> (FileComment | None):
 		"""Create a FileComment if it matches the token."""
 		match = NOQA_FILE.match(token.string)
 		if (not match):
 			return None
 		return FileComment(match, token)
 
-	def __init__(self, match: Match, token: TokenInfo) -> None:
+	def __init__(self, match: re.Match, token: TokenInfo) -> None:
 		self.flake8 = match.group('flake8')
 		self.sep = match.group('sep') or ''
 		self.noqa = match.group('noqa')
@@ -47,7 +48,7 @@ class FileComment:
 class InlineComment:
 	"""noqa comment info."""
 
-	comments: ClassVar[Dict[str, List[InlineComment]]] = {}
+	comments: ClassVar[dict[str, list[InlineComment]]] = {}
 
 	noqa: str
 	sep: str
@@ -58,7 +59,7 @@ class InlineComment:
 	start_line: int
 
 	@classmethod
-	def match(cls, token: TokenInfo, prev_token: TokenInfo = None) -> Optional[InlineComment]:
+	def match(cls, token: TokenInfo, prev_token: TokenInfo = None) -> (InlineComment | None):
 		"""Create an InlineComment if it matches the token."""
 		match = NOQA_INLINE.search(token.string)
 		if (not match):
@@ -79,7 +80,7 @@ class InlineComment:
 			return comment.start_line
 		return sorted(cls.comments.get(filename, []), key=start_line)
 
-	def __init__(self, match: Match, token: TokenInfo, prev_token: TokenInfo = None) -> None:
+	def __init__(self, match: re.Match, token: TokenInfo, prev_token: TokenInfo = None) -> None:
 		self.noqa = match.group('noqa')
 		self.sep = match.group('sep') or ''
 		self.codes = match.group('codes') or ''
