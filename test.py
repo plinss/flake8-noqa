@@ -135,6 +135,7 @@ class TestInline(unittest.TestCase):
 
 	def test_multiline(self) -> None:
 		self.assertEqual(flake8("x='''\n'''  # noqa: E225"), [])
+		self.assertEqual(flake8("x='''\n''',  # noqa: E225"), [])
 
 	def test_double(self) -> None:
 		self.assertEqual(flake8('x=1 # type: ignore[type] # noqa: X101'), [
