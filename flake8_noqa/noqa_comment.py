@@ -59,7 +59,7 @@ class InlineComment:
 	start_line: int
 
 	@classmethod
-	def match(cls, token: TokenInfo, start_token: TokenInfo = None) -> (InlineComment | None):
+	def match(cls, token: TokenInfo, start_token: (TokenInfo | None) = None) -> (InlineComment | None):
 		"""Create an InlineComment if it matches the token."""
 		match = NOQA_INLINE.search(token.string)
 		if (not match):
@@ -80,7 +80,7 @@ class InlineComment:
 			return comment.start_line
 		return sorted(cls.comments.get(filename, []), key=start_line)
 
-	def __init__(self, match: re.Match, token: TokenInfo, start_token: TokenInfo = None) -> None:
+	def __init__(self, match: re.Match, token: TokenInfo, start_token: (TokenInfo | None) = None) -> None:
 		self.noqa = match.group('noqa')
 		self.sep = match.group('sep') or ''
 		self.codes = match.group('codes') or ''

@@ -144,7 +144,7 @@ class TestInline(unittest.TestCase):
 
 	def test_require_code(self) -> None:
 		self.assertEqual(flake8('x=1 # noqa', ['--noqa-require-code']), [
-			'1:5: NQA104 "# noqa" must have codes, e.g. "# noqa: E225, E261, W292"',
+			'1:5: NQA104 "# noqa" must have codes, e.g. "# noqa: D100, E225, E261, W292"',
 		])
 
 	def test_inlude_name(self) -> None:

@@ -83,33 +83,28 @@ test_3.10:
         - test.py
 
 
-package:
-  stage: package
+test_3.11:
+  stage: test
+  image: python:3.11
   before_script:
     - source .gitlab-ci.env
-    - chmod a+x tools/set_version
-    - tools/set_version
-    - pip install --upgrade build
+    - pip install -e ".[test]"
+    - chmod a+x test.py
+  script:
+    - ./test.py
+  rules:
+    - exists:
+        - test.py
+
+
+package:
+  stage: package
+  image: docker.linss.com/docker-images/python-build:main
   script:
     - python -m build --no-isolation --outdir dist
   artifacts:
     paths:
       - dist
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-\.]+)?$/'
-
-
-pdoc3:
-  stage: package
-  before_script:
-    - source .gitlab-ci.env
-    - pip install pdoc3
-    - pip install -e .
-  script:
-    - pdoc --html --config show_type_annotations=True ${PACKAGE_NAME}
-  artifacts:
-    paths:
-      - html
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-\.]+)?$/'
 
