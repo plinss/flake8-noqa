@@ -165,7 +165,7 @@ class NoqaFilter:
 					if (self.require_code):
 						yield self._message(comment.token, Message.NOQA_REQUIRE_CODE,
 						                    comment=comment.text, noqa_strip=comment.noqa.strip(),
-						                    codes=', '.join(sorted(reports)))
+						                    codes=', '.join(sorted(set(reports))))
 
 				else:
 					yield self._message(comment.token, Message.NOQA_NO_VIOLATIONS, comment=comment.text)
