@@ -82,6 +82,7 @@ class Options(Protocol):
 
 	noqa_require_code: bool
 	noqa_include_name: bool
+	external: list[str]
 
 
 class NoqaFilter:
@@ -91,6 +92,7 @@ class NoqaFilter:
 	version: ClassVar[str] = package_version
 	plugin_name: ClassVar[str]
 	require_code: ClassVar[bool]
+	external: list[str]
 	_filters: ClassVar[list[NoqaFilter]] = []
 
 	tree: ast.AST
@@ -111,12 +113,18 @@ class NoqaFilter:
 		option_manager.add_option('--noqa-no-include-name', default=None, action='store_false',
 		                          parse_from_config=False, dest='noqa_include_name',
 		                          help='Remove plugin name from messages')
+		option_manager.add_option('--noqa-external', default=[], comma_separated_list=True,
+		                          parse_from_config=True, dest='external',
+		                          help='List of codes coming from non-Flake8 tools. Use this to allow '
+		                          'interoperability between flake8-noqa and non-Flake8 tools also using `# noqa` '
+		                          'suppression comments.')
 
 	@classmethod
 	def parse_options(cls, options: Options) -> None:
 		"""Parse plugin options."""
 		cls.plugin_name = (' (' + cls.name + ')') if (options.noqa_include_name) else ''
 		cls.require_code = options.noqa_require_code
+		cls.external = options.external
 
 	@classmethod
 	def filters(cls) -> Sequence[NoqaFilter]:
@@ -140,32 +148,31 @@ class NoqaFilter:
 	def _message(self, token: tokenize.TokenInfo, message: Message, **kwargs) -> tuple[int, int, str, Any]:
 		return (token.start[0], token.start[1], f'{message.code}{self.plugin_name} {message.text(**kwargs)}', type(self))
 
+	def _is_external_code(self, code: str) -> bool:
+		return any(code.startswith(external_code) for external_code in self.external)
+
 	def violations(self) -> Iterator[tuple[int, int, str, Any]]:
 		"""Private iterator to return violations."""
 		for comment in InlineComment.file_comments(self.filename):
-			reports = Report.reports_from(self.filename, comment.start_line, comment.end_line)
+			reports = set(Report.reports_from(self.filename, comment.start_line, comment.end_line))
 			comment_codes = set(comment.code_list)
 			if (comment_codes):
-				matched_codes: set[str] = set()
-				for code in reports:
-					if (code in comment_codes):
-						matched_codes.add(code)
-				if (matched_codes):
-					if (len(matched_codes) < len(comment_codes)):
-						unmatched_codes = comment_codes - matched_codes
-						yield self._message(comment.token, Message.NOQA_UNMATCHED_CODES,
-						                    comment=comment.text, unmatched=', '.join(unmatched_codes),
-						                    plural='codes' if (1 < len(unmatched_codes)) else 'code')
-				else:
+				external_comment_codes = {code for code in comment_codes if self._is_external_code(code)}
+				matched_and_external_codes = (reports & comment_codes) | external_comment_codes
+				if (not matched_and_external_codes):
 					yield self._message(comment.token, Message.NOQA_NO_MATCHING_CODES, comment=comment.text)
-
-				pass
+				else:
+					unmatched_codes = comment_codes - matched_and_external_codes
+					if (unmatched_codes):
+						yield self._message(comment.token, Message.NOQA_UNMATCHED_CODES,
+											comment=comment.text, unmatched=', '.join(unmatched_codes),
+											plural='codes' if (1 < len(unmatched_codes)) else 'code')
 			else:  # blanket noqa
 				if (reports):
 					if (self.require_code):
 						yield self._message(comment.token, Message.NOQA_REQUIRE_CODE,
 						                    comment=comment.text, noqa_strip=comment.noqa.strip(),
-						                    codes=', '.join(sorted(set(reports))))
+						                    codes=', '.join(sorted(reports)))
 
 				else:
 					yield self._message(comment.token, Message.NOQA_NO_VIOLATIONS, comment=comment.text)
