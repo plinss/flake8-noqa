@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = 'flake8-noqa'
 description = 'Flake8 noqa comment validation'
 readme = 'README.md'
-requires-python = '>=3.7'
+requires-python = '>= 3.7'
 keywords = ['flake8', 'noqa']
 classifiers = [
 	'Framework :: Flake8',
@@ -24,9 +24,9 @@ classifiers = [
 	'Topic :: Software Development :: Quality Assurance',
 ]
 dependencies = [
-	'flake8>=3.8.0,<7.0',
-	'importlib_metadata>=4.0.0,<5.0.0;python_version<"3.8.0"',
-	'typing_extensions>=3.7.4.2',
+	'flake8 >= 3.8.0, < 8.0',
+	'importlib_metadata >= 4.0.0, < 5.0.0; python_version < "3.8.0"',
+	'typing_extensions >= 3.7.4.2',
 ]
 dynamic = ['version']
 
