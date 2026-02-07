@@ -17,12 +17,10 @@ from .noqa_comment import FileComment, InlineComment
 if (TYPE_CHECKING):
 	from collections.abc import Iterator, Sequence
 
+package_name = (__package__ or 'flake8_noqa')
 try:
-	try:
-		from importlib.metadata import version
-	except ModuleNotFoundError:  # python < 3.8 use polyfill
-		from importlib_metadata import version  # type: ignore
-	package_version = version(__package__)
+	from importlib.metadata import version
+	package_version = version(package_name)
 except Exception:
 	package_version = 'unknown'
 
@@ -61,7 +59,7 @@ class Options(Protocol):
 class NoqaChecker:
 	"""Check noqa comments for proper formatting."""
 
-	name: ClassVar[str] = __package__.replace('_', '-')
+	name: ClassVar[str] = package_name.replace('_', '-')
 	version: ClassVar[str] = package_version
 	plugin_name: ClassVar[str]
 

@@ -7,7 +7,6 @@
 # Python output files
 *.pyc
 __pycache__
-.mypy_cache
 *.egg-info
 build/
 dist/

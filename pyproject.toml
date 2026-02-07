@@ -6,7 +6,7 @@ build-backend = 'setuptools.build_meta'
 name = 'flake8-noqa'
 description = 'Flake8 noqa comment validation'
 readme = 'README.md'
-requires-python = '>= 3.7'
+requires-python = '>= 3.9'
 keywords = ['flake8', 'noqa']
 classifiers = [
 	'Framework :: Flake8',
@@ -15,17 +15,17 @@ classifiers = [
 	'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
 	'Programming Language :: Python',
 	'Programming Language :: Python :: 3',
-	'Programming Language :: Python :: 3.7',
-	'Programming Language :: Python :: 3.8',
 	'Programming Language :: Python :: 3.9',
 	'Programming Language :: Python :: 3.10',
 	'Programming Language :: Python :: 3.11',
+	'Programming Language :: Python :: 3.12',
+	'Programming Language :: Python :: 3.13',
+	'Programming Language :: Python :: 3.14',
 	'Topic :: Software Development :: Libraries :: Python Modules',
 	'Topic :: Software Development :: Quality Assurance',
 ]
 dependencies = [
 	'flake8 >= 5.0.0, < 8.0',
-	'importlib_metadata >= 4.0.0, < 5.0.0; python_version < "3.8.0"',
 	'typing_extensions >= 3.7.4.2',
 ]
 dynamic = ['version']
@@ -46,7 +46,6 @@ text = 'GNU Lesser General Public License v3'
 
 [project.optional-dependencies]
 dev = [
-	'mypy',
 	'flake8>=3.8.0,<6.0.0',  # <6.0.0 for other extensions
 	'flake8-annotations',
 	'flake8-bandit',
@@ -67,6 +66,7 @@ dev = [
 	'flake8-typechecking-import',
 	'flake8-use-fstring',
 	'pep8-naming',
+	'ty',
 ]
 
 test = [
@@ -90,13 +90,3 @@ noqa-require-code = true
 
 use-flake8-tabs = true
 blank-lines-indent = 'never'
-
-[tool.mypy]
-mypy_path = 'stubs'
-
-[[tool.mypy.overrides]]
-module = [
-    'flake8.*',
-    'importlib.metadata',
-]
-ignore_missing_imports = true
