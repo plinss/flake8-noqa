@@ -195,7 +195,7 @@ class FileChecker(flake8.checker.FileChecker):
 
 	def report(self, error_code: (str | None), line_number: int, column: int, text: str, *args, **kwargs) -> str:
 		"""Capture report information."""
-		Report.add_report(self.processor.filename, error_code, line_number, column, text)
+		Report.add_report(self.filename, error_code, line_number, column, text)
 		return super().report(error_code, line_number, column, text, *args, **kwargs)
 
 
