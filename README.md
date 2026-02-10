@@ -92,6 +92,11 @@ Options
 `noqa-no-include-name`
 : Do not include plugin name in messages (default setting)
 
+`noqa-external`
+: List of codes coming from non-Flake8 tools. Use this to allow
+interoperability between flake8-noqa and non-Flake8 tools also using `# noqa`
+suppression comments.
+
 All options may be specified on the command line with a `--` prefix,
 or can be placed in your flake8 config file.
 

@@ -152,6 +152,19 @@ class TestInline(unittest.TestCase):
 			'1:5: NQA002 (flake8-noqa) "# noqa E225" must have a colon, e.g. "# noqa: E225"',
 		])
 
+	def test_external_code(self) -> None:
+		# Test that the comma-separated list works
+		self.assertEqual(flake8("x = 1 # noqa: EXT001", ['--noqa-external=EXT,OTHER']), [])
+		# Test with code group
+		self.assertEqual(flake8("x = 1 # noqa: EXT001", ['--noqa-external=EXT']), [])
+		# Test with exact code
+		self.assertEqual(flake8("x = 1 # noqa: EXT001", ['--noqa-external=EXT001']), [])
+		# Test that it's not included in "no matching violations" / "unmatched code"
+		self.assertEqual(flake8('x = 1 # noqa: EXT001, X101', ['--noqa-external=EXT']), [
+			'1:5: NQA103 "# noqa: EXT001, X101" has unmatched code, remove X101',
+		])
+		self.assertEqual(flake8('x=1 # noqa: E225, EXT001', ['--noqa-external=EXT']), [])
+
 
 if __name__ == '__main__':
 	unittest.main()
